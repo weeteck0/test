@@ -1,0 +1,50 @@
+
+<h2 class="mt-3">Recommended Build</h2>
+
+<% if (messages && messages.length > 0) { %>
+  <% messages.forEach(function(msg) { %>
+    <div class="alert alert-success"><%= msg %></div>
+  <% }); %>
+<% } %>
+<% if (typeof error !== 'undefined' && error.length > 0) { %>
+  <% error.forEach(function(msg) { %>
+    <div class="alert alert-danger"><%= msg %></div>
+  <% }); %>
+<% } %>
+
+<p>Your budget: $<%= budget %></p>
+
+<table class="table table-bordered mt-3">
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Name</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CPU</td>
+      <td><%= cpu ? cpu.name : 'No recommendation' %></td>
+      <td><%= cpu ? '$' + cpu.price : '-' %></td>
+    </tr>
+    <tr>
+      <td>GPU</td>
+      <td><%= gpu ? gpu.name : 'No recommendation' %></td>
+      <td><%= gpu ? '$' + gpu.price : '-' %></td>
+    </tr>
+    <tr>
+      <td>RAM</td>
+      <td><%= ram ? ram.name : 'No recommendation' %></td>
+      <td><%= ram ? '$' + ram.price : '-' %></td>
+    </tr>
+  </tbody>
+</table>
+
+<% if (cpu && gpu && ram) { %>
+  <div class="alert alert-info">
+    <strong>Total:</strong> $<%= (cpu.price + gpu.price + ram.price).toFixed(2) %>
+  </div>
+<% } %>
+
+<a href="/dashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>

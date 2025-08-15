@@ -1,0 +1,84 @@
+<%- include('partials/header') %>
+<h2 class="mt-3">Edit Your PC Build</h2>
+
+<% if (messages.length > 0) { %>
+  <div class="alert alert-success"><%= messages[0] %></div>
+<% } %>
+
+<form action="/builds/<%= build.id %>/edit" method="POST">
+  <!-- CPU -->
+  <label>CPU:</label>
+  <select name="cpu_id" class="form-control" id="cpuSelect">
+    <% cpus.forEach(cpu => { %>
+      <option value="<%= cpu.id %>" data-price="<%= cpu.price %>" <%= cpu.id === build.cpu_id ? 'selected' : '' %>>
+        <%= cpu.name %> ($<%= cpu.price %>)
+      </option>
+    <% }) %>
+  </select>
+
+  <!-- GPU -->
+  <label>GPU:</label>
+  <select name="gpu_id" class="form-control" id="gpuSelect">
+    <% gpus.forEach(gpu => { %>
+      <option value="<%= gpu.id %>" data-price="<%= gpu.price %>" <%= gpu.id === build.gpu_id ? 'selected' : '' %>>
+        <%= gpu.name %> ($<%= gpu.price %>)
+      </option>
+    <% }) %>
+  </select>
+
+  <!-- RAM -->
+  <label>RAM:</label>
+  <select name="ram_id" class="form-control" id="ramSelect">
+    <% rams.forEach(ram => { %>
+      <option value="<%= ram.id %>" data-price="<%= ram.price %>" <%= ram.id === build.ram_id ? 'selected' : '' %>>
+        <%= ram.name %> ($<%= ram.price %>)
+      </option>
+    <% }) %>
+  </select>
+
+  <!-- Price, Tier, Budget Bar -->
+  <div class="mt-3">
+    <p>Total Price: $<span id="total-price"><%= build.total_price %></span></p>
+    <p>Performance Tier: <span id="tier-label">...</span></p>
+    <div class="progress mt-2">
+      <div class="progress-bar" id="budget-bar" role="progressbar" style="width: 0%;">
+        $0 / $<%= budget %>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary mt-3">Update Build</button>
+  <button type="reset" class="btn btn-secondary mt-3">Reset</button>
+</form>
+
+<p class="text-muted mt-3">Last updated: <%= new Date(build.last_updated).toLocaleString() %></p>
+
+<script>
+  const cpu = document.getElementById("cpuSelect");
+  const gpu = document.getElementById("gpuSelect");
+  const ram = document.getElementById("ramSelect");
+  const totalDisplay = document.getElementById("total-price");
+  const tierLabel = document.getElementById("tier-label");
+  const budgetBar = document.getElementById("budget-bar");
+  const budgetLimit = Number('<%= budget %>');
+
+  function getPrice(sel) {
+    return parseFloat(sel.options[sel.selectedIndex].dataset.price || 0);
+  }
+
+  function updateUI() {
+    const total = getPrice(cpu) + getPrice(gpu) + getPrice(ram);
+    totalDisplay.textContent = total.toFixed(2);
+    const percent = Math.min((total / budgetLimit) * 100, 100);
+    budgetBar.style.width = percent + "%";
+    budgetBar.textContent = `$${total.toFixed(2)} / $${budgetLimit}`;
+    let tier = "Budget";
+    if (total > 1500) tier = "High-End";
+    else if (total > 800) tier = "Mid-Range";
+    tierLabel.textContent = tier;
+  }
+
+  [cpu, gpu, ram].forEach(s => s.addEventListener("change", updateUI));
+  updateUI();
+</script>
+<%- include('partials/footer') %>
